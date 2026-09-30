@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Ellipse as EllipsePatch
 
-from uncertain_cpa_metrics import solve_tcpa_interval, solve_dcpa_interval, Interval
+from examples.uncertain_cpa_metrics import solve_tcpa_interval, solve_dcpa_interval, Interval
 from utils.set_utils import Ellipse, Interval, Ship, Circle, MinkowskiSum
 from utils.metric_utils import TCPA, DCPA, VelocityObstacle, point_in_cone, point_in_inflated_cone
 from utils.plotting_utils import plot_collision_cone, plot_inflated_cone
