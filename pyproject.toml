@@ -22,4 +22,4 @@ dependencies = [
 plot = ["matplotlib"]
 
 [tool.setuptools.packages.find]
-include = ["utils"]
+include = ["utils", "examples"]
