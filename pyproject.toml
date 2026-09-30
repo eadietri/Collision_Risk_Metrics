@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "Collision_Risk_Metrics"
+version = "0.1.0"
+description = "Convex Minkowski-sum geometry and velocity obstacles under uncertainty"
+requires-python = ">=3.10"
+authors = [{ name = "Liz Dietrich and Liam Imagawa", email = "liamimagawa@gmail.com" }]
+dependencies = [
+    "numpy",
+    "scipy",
+    "matplotlib",
+    "pandas"
+]
+
+# matplotlib is only needed for the plotting modules; the compute core
+# (minkowski_utils.shapes/minkowski, vo_utils.cone/obstacle/uncertainty) is
+# numpy/scipy only.  Install with:  pip install -e ".[plot]"
+[project.optional-dependencies]
+plot = ["matplotlib"]
+
+[tool.setuptools.packages.find]
+include = ["utils"]
