@@ -4,12 +4,15 @@ Visualise deterministic vs interval TCPA/DCPA.
 from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib
 from matplotlib.patches import Ellipse as EllipsePatch
 
 from examples.uncertain_cpa_metrics import solve_tcpa_interval, solve_dcpa_interval, Interval
 from utils.set_utils import Ellipse, Interval, Ship, Circle, MinkowskiSum
 from utils.metric_utils import TCPA, DCPA, VelocityObstacle, point_in_cone, point_in_inflated_cone
 from utils.plotting_utils import plot_collision_cone, plot_inflated_cone
+
+matplotlib.rcParams["pdf.fonttype"] = 42 
 
 def combined_safety_radius(ego, obstacle):
     """Combined disc clearance (own + target radii). Circular domains only."""
@@ -267,14 +270,16 @@ if __name__ == "__main__":
     out.mkdir(parents=True, exist_ok=True)
 
     fig_vo_png, fig_vo_pdf = plot_enlarged_velocity_obstacle(ego, obstacle, original_VO, VO_with_position_uncertainty, VO_with_velocity_uncertainty, vos, ves, n_samples)
-    fig_vo_png.savefig(out / "enlarged_vo.png", dpi=150, bbox_inches="tight")
-    fig_vo_pdf.savefig(out / "enlarged_vo.pdf")
-    
+    fig_vo_png.savefig(out / "enlarged_vo.png", dpi=150, bbox_inches="tight")          # labeled
+    bare = dict(bbox_inches="tight", pad_inches=0, facecolor="white")
+    fig_vo_pdf.savefig(out / "enlarged_vo.pdf", dpi=150, **bare)
+    fig_vo_pdf.savefig(out / "enlarged_vo_bare.png", dpi=300, **bare)                   # bare PNG
+
     fig_png, fig_pdf = plot_tcpa_dcpa_cloud(
         P, Vrel, tcpa_iv, dcpa_iv, R=combined_safety_radius(ego, obstacle))
-    fig_png.savefig(out / "tcpa_dcpa_cloud.png", dpi=150, bbox_inches="tight")
-    fig_pdf.savefig(out / "tcpa_dcpa_cloud.pdf", bbox_inches="tight",
-                    pad_inches=0, facecolor="white")
+    fig_png.savefig(out / "tcpa_dcpa_cloud.png", dpi=150, bbox_inches="tight")          # labeled
+    fig_pdf.savefig(out / "tcpa_dcpa_cloud.pdf", dpi=150, **bare)
+    fig_pdf.savefig(out / "tcpa_dcpa_cloud_bare.png", dpi=300, **bare)                  # bare PNG
  
     plt.close("all")
     print(f"\nFigures saved to {out}/")

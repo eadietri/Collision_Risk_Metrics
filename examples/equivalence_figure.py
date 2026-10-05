@@ -6,7 +6,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from scipy.interpolate import griddata
 
-CSV = "equivalence.csv"
+CSV = "examples/equivalence.csv"
 R = 20.0
 
 df = pd.read_csv(CSV)
@@ -15,7 +15,7 @@ dcpa, tcpa = df["dcpa"].to_numpy(), df["tcpa"].to_numpy()
 
 holds_d = dcpa <= R
 holds_t = tcpa > 0
-
+matplotlib.rcParams["pdf.fonttype"] = 42 
 
 def to_color(holds, mag, clip_pct=95):
     c = np.full(len(mag), 0.0)
@@ -29,6 +29,17 @@ def to_color(holds, mag, clip_pct=95):
         c[mask] = lo_c + normed * (hi_c - lo_c)
     return c
 
+# uses maximum:
+# def to_color(holds, mag):
+#     c = np.zeros(len(mag))
+#     for mask, lo_c, hi_c in [(holds, -1.0, 0.0), (~holds, 0.0, 1.0)]:
+#         if not mask.any():
+#             continue
+#         vals = mag[mask]
+#         vmax = vals.max()
+#         normed = vals / vmax if vmax > 0 else np.zeros(mask.sum())
+#         c[mask] = lo_c + normed * (hi_c - lo_c)
+#     return c
 
 dcpa_c = to_color(holds_d, dcpa)
 tcpa_c = to_color(holds_t, np.abs(tcpa))
@@ -49,19 +60,24 @@ panels = [
      lambda ax: ax.contour(XI, YI, np.minimum(R - zi_d, zi_t), levels=[0], colors='black', linewidths=2, zorder=10)),
 ]
 
-# --- Individual PDFs (no labels, no ticks) ---
+# --- Individual PDFs + PNGs (no labels, no ticks) ---
 for data, out, draw_contour in panels:
     fig, ax = plt.subplots(figsize=(5, 5))
     fig.patch.set_facecolor('white')
     ax.set_facecolor('white')
     ax.scatter(x, y, c=data, cmap="PuRd", s=30, alpha=0.8,
-               edgecolors="none", linewidths=0.15, vmin=-1, vmax=1)
+               edgecolors="none", linewidths=0.15, vmin=-1, vmax=1,
+               rasterized=True)  # points become one image inside the PDF
     draw_contour(ax)
     ax.set_aspect("equal")
     ax.axis("off")
-    fig.savefig(out, bbox_inches="tight", pad_inches=0, facecolor='white')
+
+    save_kw = dict(bbox_inches="tight", pad_inches=0, facecolor="white")
+    fig.savefig(out, dpi=300, **save_kw)                          # PDF
+    png_out = out.replace(".pdf", ".png")
+    fig.savefig(png_out, dpi=150, **save_kw)    # PNG
     plt.close(fig)
-    print(f"Wrote {out}")
+    print(f"Wrote {out} and {png_out}")
 
 # --- Combined PNG (with labels) ---
 fig, axes = plt.subplots(1, 3, figsize=(17, 5.4), sharex=True, sharey=True, constrained_layout=True)
